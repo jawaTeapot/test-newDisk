@@ -46,7 +46,6 @@
         </div>
         <v-select v-model="sortSelect" :options="sortingOptions"></v-select>
       </div>
-      <!--      <v-select v-model="sortSelect" :options="sortingOptions"></v-select>-->
     </div>
     <div class="main__showcase">
       <Card v-for="item in cards" :card="item"></Card>

@@ -80,7 +80,6 @@ import HelloWorld from "./components/HelloWorld.vue";
     border: none;
   }
   .vs__dropdown-menu {
-    //width: auto;
     left: -110px;
   }
 }
