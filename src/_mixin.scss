@@ -1,10 +1,4 @@
 @mixin tablet {
-  @media (max-width: 1024px) {
-    @content;
-  }
-}
-
-@mixin tablet-port {
   @media (max-width: 768px) {
     @content;
   }

@@ -5,6 +5,7 @@
     <div class="header__block">
       <div class="header__block-search">Поиск</div>
       <input
+        v-model="search"
         class="header__block-input"
         type="text"
         placeholder="Поиск по каталогу"
@@ -14,20 +15,30 @@
   </div>
   <div class="main">
     <div class="main__top">
-      <div class="main__top-result">458 результатов</div>
+      <div class="main__top-result">{{ filteredData.length }} результатов</div>
       <div class="main__block">
         <div class="main__block-text">Сортировать по:</div>
-        <div class="main__sorting main__sorting--active">
+        <div
+          class="main__sorting"
+          :class="{ 'main__sorting--active': sortingName === 'cost' }"
+          @click="changeSort('cost')"
+        >
           <div class="main__sorting-text">Цене</div>
           <img
+            v-show="sortingName === 'cost'"
             class="main__sorting-img"
             src="../assets/arrow-down.svg"
             alt="img"
           />
         </div>
-        <div class="main__sorting">
+        <div
+          class="main__sorting"
+          @click="changeSort('title')"
+          :class="{ 'main__sorting--active': sortingName === 'title' }"
+        >
           <div class="main__sorting-text">Алфавиту</div>
           <img
+            v-show="sortingName === 'title'"
             class="main__sorting-img"
             src="../assets/arrow-down.svg"
             alt="img"
@@ -39,59 +50,68 @@
       <Card v-for="item in cards" :card="item"></Card>
     </div>
     <div class="pagination">
-      <button class="pagination__btn">
-        <img
-          class="pagination__btn-img"
-          src="../assets/nav-left.svg"
-          alt="img"
-        />
-      </button>
-      <button class="pagination__btn">1</button>
-      <button class="pagination__btn">2</button>
-      <button class="pagination__btn">3</button>
-      <button class="pagination__btn">4</button>
-      <button class="pagination__btn">5</button>
-      <button class="pagination__btn">...</button>
-      <button class="pagination__btn">15</button>
-      <button class="pagination__btn">
-        <img
-          class="pagination__btn-img"
-          src="../assets/nav-right.svg"
-          alt="img"
-        />
-      </button>
-    </div>
-    <template>
       <vue-awesome-paginate
-        :total-items="50"
-        :items-per-page="5"
-        :max-pages-shown="5"
-        :current-page="1"
+        :total-items="filteredData.length"
+        :items-per-page="itemPerPage"
+        :current-page="currentPage"
         :on-click="onClickHandler"
       />
-    </template>
+    </div>
   </div>
 </template>
 
 <script setup>
 import data from "../../public/data.json";
-console.log(data);
 import { ref, computed } from "vue";
 import Card from "./Card.vue";
 
-defineProps({});
+const search = ref("");
+const sortingName = ref("");
+const currentPage = ref(1);
+const itemPerPage = ref(9);
 
-const cards = computed(() => {
-  return data;
+const filteredData = computed(() => {
+  let fd = Array.from(data);
+  if (search.value) {
+    fd = fd.filter((item) => {
+      return item.title.toLowerCase().includes(search.value.toLowerCase());
+    });
+  }
+  if (sortingName.value) {
+    fd = fd.sort((a, b) => {
+      if (a[sortingName.value] < b[sortingName.value]) {
+        return -1;
+      }
+      if (a[sortingName.value] > b[sortingName.value]) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+  return fd;
 });
 
-const count = ref(0);
+const cards = computed(() => {
+  let offset = 0;
+  offset = (currentPage.value - 1) * (itemPerPage.value - 1);
+  return filteredData.value.slice(offset, itemPerPage.value);
+});
+
 const onClickHandler = (page) => {
-  console.log(page);
+  currentPage.value = page;
+};
+
+const changeSort = (sort) => {
+  if (sortingName.value === sort) {
+    sortingName.value = "";
+  } else {
+    sortingName.value = sort;
+  }
 };
 </script>
 
 <style lang="scss" scoped>
+@import "../mixin";
 .header {
   &__img {
     margin: 30px 0;
@@ -204,6 +224,7 @@ const onClickHandler = (page) => {
     display: flex;
     align-items: center;
     cursor: pointer;
+    user-select: none;
     &--active {
       .main__sorting-text {
         color: #4c5a79;
@@ -242,7 +263,6 @@ const onClickHandler = (page) => {
       margin-left: 3px;
       width: 5px;
       height: 19px;
-      opacity: 0;
     }
   }
   &__showcase {
@@ -250,6 +270,12 @@ const onClickHandler = (page) => {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 30px;
+    @include tablet {
+      grid-template-columns: 1fr 1fr;
+    }
+    @include phone {
+      grid-template-columns: 1fr;
+    }
   }
 }
 .pagination {
