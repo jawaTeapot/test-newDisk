@@ -29,23 +29,59 @@ import HelloWorld from "./components/HelloWorld.vue";
   column-gap: 10px;
 }
 .paginate-buttons {
-  height: 40px;
-  width: 40px;
-  border-radius: 20px;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
   cursor: pointer;
-  background-color: rgb(242, 242, 242);
-  border: 1px solid rgb(217, 217, 217);
-  color: black;
+  background-color: #f0f4fc;
+  border: none;
+  outline: none;
+  font-family: "Houschka Pro", sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 28px;
+  color: #0066b3;
 }
-.paginate-buttons:hover {
-  background-color: #d8d8d8;
+.paginate-buttons {
+  &:hover {
+    background-color: #e2e8f3;
+  }
+  &:active {
+    box-shadow: inset 0 3px 4px rgba(0, 0, 0, 0.2);
+  }
 }
 .active-page {
-  background-color: #3498db;
-  border: 1px solid #3498db;
+  background-color: #4c5a79;
   color: white;
+  &:hover {
+    background-color: #4c5a79;
+  }
 }
-.active-page:hover {
-  background-color: #2988c8;
+.v-select {
+  display: none;
+  padding: 0;
+  font-family: "Houschka Pro", sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 18px;
+  color: #4c5a79;
+  @include phone {
+    display: block;
+  }
+  .vs__selected {
+    margin: 4px 0 0;
+    padding: 0;
+  }
+  .vs__dropdown-toggle {
+    align-items: center;
+    border: none;
+  }
+  .vs__dropdown-menu {
+    //width: auto;
+    left: -110px;
+  }
 }
 </style>

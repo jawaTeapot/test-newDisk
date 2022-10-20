@@ -44,7 +44,9 @@
             alt="img"
           />
         </div>
+        <v-select v-model="sortSelect" :options="sortingOptions"></v-select>
       </div>
+      <!--      <v-select v-model="sortSelect" :options="sortingOptions"></v-select>-->
     </div>
     <div class="main__showcase">
       <Card v-for="item in cards" :card="item"></Card>
@@ -55,20 +57,48 @@
         :items-per-page="itemPerPage"
         :current-page="currentPage"
         :on-click="onClickHandler"
-      />
+      >
+        <template #prev-button
+          ><img
+            class="pagination__img"
+            src="../assets/nav-left.svg"
+            alt="img"
+          />
+        </template>
+        <template #next-button
+          ><img
+            class="pagination__img"
+            src="../assets/nav-right.svg"
+            alt="img"
+          />
+        </template>
+      </vue-awesome-paginate>
     </div>
   </div>
 </template>
 
 <script setup>
 import data from "../../public/data.json";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
+import { useMediaQuery } from "@vueuse/core";
 import Card from "./Card.vue";
 
+const isScreenTablet = useMediaQuery("(max-width: 768px)");
+const isScreenPhone = useMediaQuery("(max-width: 425px)");
+
 const search = ref("");
+const sortSelect = ref("");
 const sortingName = ref("");
 const currentPage = ref(1);
-const itemPerPage = ref(9);
+const itemPerPage = computed(() => {
+  if (isScreenPhone.value) return 3;
+  if (isScreenTablet.value) return 6;
+  return 9;
+});
+const sortingOptions = ref([
+  { value: "cost", label: "По цене" },
+  { value: "title", label: "По алфавиту" },
+]);
 
 const filteredData = computed(() => {
   let fd = Array.from(data);
@@ -93,8 +123,11 @@ const filteredData = computed(() => {
 
 const cards = computed(() => {
   let offset = 0;
-  offset = (currentPage.value - 1) * (itemPerPage.value - 1);
-  return filteredData.value.slice(offset, itemPerPage.value);
+  offset = (currentPage.value - 1) * itemPerPage.value;
+  return filteredData.value.slice(
+    offset,
+    currentPage.value * itemPerPage.value
+  );
 });
 
 const onClickHandler = (page) => {
@@ -108,6 +141,14 @@ const changeSort = (sort) => {
     sortingName.value = sort;
   }
 };
+
+watch(sortSelect, (newVal) => {
+  if (newVal) {
+    changeSort(newVal.value);
+  } else {
+    changeSort("");
+  }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -125,6 +166,10 @@ const changeSort = (sort) => {
     font-size: 42px;
     line-height: 50px;
     color: #4c5a79;
+    @include phone {
+      font-size: 35px;
+      line-height: 40px;
+    }
   }
   &__block {
     display: flex;
@@ -185,6 +230,14 @@ const changeSort = (sort) => {
         line-height: 28px;
         color: #4c5a79;
       }
+      @include phone {
+        font-size: 15px;
+        line-height: 24px;
+        &::placeholder {
+          font-size: 15px;
+          line-height: 24px;
+        }
+      }
     }
     &-img {
       width: 24px;
@@ -205,6 +258,10 @@ const changeSort = (sort) => {
       font-size: 15px;
       line-height: 19px;
       color: #4c5a79;
+      @include phone {
+        font-size: 13px;
+        line-height: 18px;
+      }
     }
   }
   &__block {
@@ -217,6 +274,11 @@ const changeSort = (sort) => {
       font-size: 15px;
       line-height: 19px;
       color: #9db0bf;
+      @include phone {
+        margin-right: 2px;
+        font-size: 13px;
+        line-height: 18px;
+      }
     }
   }
   &__sorting {
@@ -225,6 +287,9 @@ const changeSort = (sort) => {
     align-items: center;
     cursor: pointer;
     user-select: none;
+    @include phone {
+      display: none;
+    }
     &--active {
       .main__sorting-text {
         color: #4c5a79;
@@ -283,25 +348,10 @@ const changeSort = (sort) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  &__btn {
-    margin-right: 10px;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f0f4fc;
-    border-radius: 3px;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    &:last-child {
-      margin-right: 0;
-    }
-    &-img {
-      width: 24px;
-      height: 24px;
-    }
+
+  &__img {
+    width: 24px;
+    height: 24px;
   }
 }
 </style>
