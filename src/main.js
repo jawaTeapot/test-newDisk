@@ -1,5 +1,7 @@
 import { createApp } from "vue";
 import "./reset.css";
 import App from "./App.vue";
+import VueAwesomePaginate from "vue-awesome-paginate";
+import "vue-awesome-paginate/dist/style.css";
 
-createApp(App).mount("#app");
+createApp(App).use(VueAwesomePaginate).mount("#app");

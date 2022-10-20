@@ -44,6 +44,7 @@ defineProps({
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: 4px;
+  cursor: pointer;
   &:hover {
     .card__bottom {
       height: 100%;
